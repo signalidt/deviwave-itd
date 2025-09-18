@@ -2,7 +2,7 @@
 Deviation-aware multi-resolution insider-threat detection from logs via behavioral matrices, DWT subbands, and resolution-aware attention.
 
 > ⚠️ **Project status:** Work in progress. We are actively adding code, docs, and experiments.  
-> 项目仍在完善中，代码与文档将持续补充与更新。
+
 
 ---
 
