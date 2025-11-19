@@ -1,0 +1,8 @@
+numpy
+pandas
+pywt
+scikit-learn
+torch
+xgboost
+PyYAML
+tqdm
