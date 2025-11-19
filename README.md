@@ -203,11 +203,17 @@ pip install -r requirements.txt
 
 ## Run preprocessing
 ```bash
-python Preprocess/step1_log_split.py
-python Preprocess/step2_log_merge.py
-python Preprocess/step3_log_labeling.py
-python Preprocess/step4_hourly_stat.py
+python Preprocess/step1_log_split.py  -c config.yaml
+python Preprocess/step2_log_merge.py  -c config.yaml
+python Preprocess/step3_log_labeling.py  -c config.yaml
+python Preprocess/step4_hourly_stat.py  -c config.yaml
 ```
+
+## Run Base experiments
+```bash
+python S2I_Behavior_Model/Base_Model/s2i_decompose_mask_attention_tcn.py
+```
+
 
 ## Run ablation experiments
 ```bash
@@ -219,7 +225,13 @@ python S2I_Behavior_Model/Ablation/s2i_decompose_mask_attention_caps_24_72_168_a
 
 # XGBoost
 python S2I_Behavior_Model/Ablation/s2i_decompose_mask_attention_xgb_24_72_168_ablation.py
-```
 
+# OCSVM
+python S2I_Behavior_Model/Ablation/s2i_decompose_mask_attention_ocsvm_24_72_168_ablation.py
+
+# CATE
+python S2I_Behavior_Model/Ablation/s2i_decompose_mask_attention_cate_24_72_168_ablation.py
+
+```
 ---
 
