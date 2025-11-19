@@ -1,81 +1,82 @@
-# deviwave-itd
-Deviation-aware multi-resolution insider-threat detection from logs via behavioral matrices, DWT subbands, and resolution-aware attention.
+# DeviWave-ITD: Multi-Resolution Insider Threat Detection with Behavioral Matrices & Wavelet Decomposition
 
-## Overview
-DeviWave-ITD builds behavioral matrices from user logs, applies deviation-aware reweighting, performs DWT-based multi-resolution decomposition with resolution-aware attention, and feeds the representation to a detector to produce anomaly scores.
+## 📘 Overview
 
+**DeviWave-ITD** is an end-to-end insider threat detection framework that transforms raw user activity logs into multi-resolution behavioral signals.  
+It integrates:
 
-### Multi-Modal Decomposition, Attention, and Sequential Modeling for Insider Threat Detection
+- **Behavioral matrix construction**
+- **Deviation-aware modulation**
+- **DWT/FFT frequency decomposition**
+- **Attention-enhanced sequence modeling**
+- **Unified ablation testing across multiple models**
 
-This repository provides a complete end-to-end pipeline for **insider threat detection** based on user behavior analytics.  
-The system includes:
-
-- A full **data preprocessing pipeline** that converts raw CERT logs into structured 24h / 72h / 168h behavioral sequences.
-- A unified **S2I (Signal-to-Insight)** modeling framework integrating:
-  - Wavelet & FFT decomposition  
-  - Deviation-based masking  
-  - Attention modules (SE/CBAM)  
-  - TCN, Capsule Network, CATE, XGBoost, OCSVM models  
-- A consistent **ablation evaluation framework** for all models.
+The complete pipeline converts raw CERT logs into structured multi-day behavior sequences (24h/72h/168h) and feeds them into deep and traditional models for anomaly detection.
 
 ---
+
 # 📂 Project Structure
 
+```
 Project/
 │── imgs/
 │
 │── Preprocess/
-│ ├── output/
-│ │ ├── log_merged/
-│ │ ├── log_merged_24_hours/
-│ │ └── log_split/
-│ │ ├── http_domains.csv
-│ │ ├── http_domains_with_category.csv
-│ │ ├── ldap_with_device.csv
-│ │ ├── ldap_with_device_department.csv
-│ │ └── ...
-│ │
-│ ├── config.yaml
-│ ├── department_relationship_extract.py
-│ ├── device_extract.py
-│ ├── domain_categories.py
-│ ├── domain_extract.py
-│ ├── step1_log_split.py
-│ ├── step2_log_merge.py
-│ ├── step3_log_labeling.py
-│ └── step4_hourly_stat.py
+│   ├── output/
+│   │   ├── log_merged/
+│   │   ├── log_merged_24_hours/
+│   │   └── log_split/
+│   │       ├── http_domains.csv
+│   │       ├── http_domains_with_category.csv
+│   │       ├── ldap_with_device.csv
+│   │       ├── ldap_with_device_department.csv
+│   │       └── ...
+│   ├── config.yaml
+│   ├── department_relationship_extract.py
+│   ├── device_extract.py
+│   ├── domain_categories.py
+│   ├── domain_extract.py
+│   ├── step1_log_split.py
+│   ├── step2_log_merge.py
+│   ├── step3_log_labeling.py
+│   └── step4_hourly_stat.py
 │
 │── S2I_Behavior_Model/
-│ ├── Base_Model/
-│ │ └── s2i_decompose_mask_attention_tcn.py
-│ │
-│ ├── Ablation/
-│ │ ├── s2i_decompose_mask_attention_caps_24_72_168_ablation.py
-│ │ ├── s2i_decompose_mask_attention_cate_24_72_168_ablation.py
-│ │ ├── s2i_decompose_mask_attention_ocsvm_24_72_168_ablation.py
-│ │ ├── s2i_decompose_mask_attention_tcn_24_72_168_ablation.py
-│ │ └── s2i_decompose_mask_attention_xgb_24_72_168_ablation.py
+│   ├── Base_Model/
+│   │   └── s2i_decompose_mask_attention_tcn.py
+│   ├── Ablation/
+│   │   ├── ..._caps_24_72_168_ablation.py
+│   │   ├── ..._cate_24_72_168_ablation.py
+│   │   ├── ..._ocsvm_24_72_168_ablation.py
+│   │   ├── ..._tcn_24_72_168_ablation.py
+│   │   └── ..._xgb_24_72_168_ablation.py
 │
 └── README.md
-
+```
 
 ---
 
-# 🧩 1. Preprocessing Pipeline
+# 🧩 1. Data Preprocessing Pipeline
 
-The raw CERT logs are transformed into hourly behavioral profiles through the following steps:
+The raw CERT logs are converted into structured hourly behavioral matrices through four stages:
 
-### **Step 1 — Log Splitting**
-Separates HTTP, LDAP, EMAIL, FILE, DEVICE logs into structured CSVs.
+## **Step 1 — Log Splitting**
+Splits raw logs into category-specific CSVs:
 
-### **Step 2 — Log Merging**
+- HTTP  
+- LDAP  
+- Email  
+- File  
+- Device  
+
+## **Step 2 — Log Merging**
 Merges all event categories by timestamp for each user.
 
-### **Step 3 — Log Labeling**
-Assigns anomaly labels based on scenario descriptions.
+## **Step 3 — Log Labeling**
+Assigns labels according to scenario-based anomaly rules.
 
-### **Step 4 — Hourly Behavioral Statistics**
-Produces 24-hour daily behavior matrices containing:
+## **Step 4 — Hourly Behavioral Statistics**
+Produces a **6×24 behavioral matrix** containing hourly counts of:
 
 - device_count  
 - email_count  
@@ -84,135 +85,141 @@ Produces 24-hour daily behavior matrices containing:
 - logon_count  
 - total_behavior_count  
 
-These form the 6×24 behavioral signals used by all models.
+This 6-channel behavioral signal is the fundamental input to all models.
 
 ---
 
-# 🔬 2. S2I Behavior Modeling Framework
+# 🔬 2. S2I (Signal-to-Insight) Modeling Framework
 
-The S2I framework converts behavioral matrices into enriched multi-modal signals:
-
----
+The S2I framework converts raw behavioral matrices into multi-modal feature representations.
 
 ## **2.1 Frequency Decomposition**
 
-### **Wavelet Decomposition (DWT)**
-Extracts:
-- Approximation coefficients (cA)  
-- Horizontal, Vertical, Diagonal details (cH, cV, cD)
+### **Wavelet (DWT) Decomposition**
+Generates multi-resolution components:
+
+- Approximation: **cA**  
+- Horizontal detail: **cH**  
+- Vertical detail: **cV**  
+- Diagonal detail: **cD**
 
 ### **FFT Band Decomposition**
-Produces:
-- Low-frequency band  
-- Mid-frequency band  
-- High-frequency band  
+Produces three frequency sub-bands:
+
+- **Low-frequency**
+- **Mid-frequency**
+- **High-frequency**
 
 ---
 
 ## **2.2 Deviation Mask Modulation (DMM)**
 
-A robust noise-resilient enhancement:
+Used to highlight abnormal behavioral spikes while suppressing normal noise.
 
+```
 delta = |x - μ| / σ
-if delta < 1.0 → mask = 0.7
-else → mask = 1 + 0.5*delta
+
+if delta < 1.0:
+    mask = 0.7
+else:
+    mask = 1 + 0.5 * delta
+
 enhanced = x * mask
+```
 
-
-Amplifies unusual spikes while reducing normal background noise.
+Effects:
+- **Suppresses normal behavior**
+- **Amplifies deviations**
+- **Enhances anomaly separability**
 
 ---
 
-## **2.3 Attention Module**
+## **2.3 Attention Modules**
 
-Two attention mechanisms are applied:
+Two attention mechanisms refine the decomposed signals:
 
-- **SEBlock**: channel-wise recalibration  
-- **CBAM**: channel + spatial attention  
-
-Integrated before sequence modeling.
+- **SEBlock** — channel-wise recalibration  
+- **CBAM** — combined channel & spatial attention  
 
 ---
 
 # 🔥 3. Base Model: Attention-TCN
 
-The primary deep model combines:
+The main deep learning model integrates:
 
-- Input decomposition (DWT or FFT)
-- Mask-based modulation  
+- Multi-resolution decomposition  
+- Deviation modulation  
 - CBAM attention  
-- TCN layers with dilation  
+- Dilated TCN layers  
 - MLP classifier  
 
-It supports three window configurations:  
-**24h**, **72h**, **168h**
+Supports three temporal windows:
+
+- **24 hours**  
+- **72 hours**  
+- **168 hours**
 
 ---
 
 # 🧪 4. Ablation Models
 
-To deeply analyze each component, multiple models are implemented.
+Implemented models for component-level evaluation:
 
-### **✔ Capsule Network (CapsNet)**
-`Ablation/s2i_decompose_mask_attention_caps_24_72_168_ablation.py`
-
-### **✔ CATE Sequence Model**
-`Ablation/s2i_decompose_mask_attention_cate_24_72_168_ablation.py`
-
-### **✔ One-Class SVM (OC-SVM)**
-`Ablation/s2i_decompose_mask_attention_ocsvm_24_72_168_ablation.py`
-
-### **✔ TCN Baseline**
-`Ablation/s2i_decompose_mask_attention_tcn_24_72_168_ablation.py`
-
-### **✔ XGBoost (Tree-Based Baseline)**
-`Ablation/s2i_decompose_mask_attention_xgb_24_72_168_ablation.py`
+| Model Type | Script |
+|------------|--------|
+| Capsule Network | s2i_decompose_mask_attention_caps_24_72_168_ablation.py |
+| CATE Sequence Model | s2i_decompose_mask_attention_cate_24_72_168_ablation.py |
+| OC-SVM | s2i_decompose_mask_attention_ocsvm_24_72_168_ablation.py |
+| TCN Baseline | s2i_decompose_mask_attention_tcn_24_72_168_ablation.py |
+| XGBoost | s2i_decompose_mask_attention_xgb_24_72_168_ablation.py |
 
 ---
 
 # 📊 5. Ablation Settings
 
-Each model supports four ablation variants:
+Each model contains four variants:
 
-1. **full**  
-2. **w/o Deviation Modulation**  
-3. **w/o DWT / w/o FFT**  
-4. **w/o Attention**
-
-Experiments run on:
-
-- **24-hour windows**  
-- **72-hour windows**  
-- **168-hour windows**  
+1. **Full configuration**  
+2. **Without deviation modulation**  
+3. **Without DWT/FFT**  
+4. **Without attention module**
 
 Metrics reported:
 
-- **Precision**  
-- **Recall**  
-- **F1 score**
+- Precision  
+- Recall  
+- F1-score  
+
+Across 24h / 72h / 168h behavior windows.
 
 ---
 
 # ▶️ 6. Usage Instructions
 
-## **1. Install dependencies**
-
+## Install dependencies
+```bash
 pip install -r requirements.txt
+```
 
-## **2. Run preprocessing**
-
+## Run preprocessing
+```bash
 python Preprocess/step1_log_split.py
 python Preprocess/step2_log_merge.py
 python Preprocess/step3_log_labeling.py
 python Preprocess/step4_hourly_stat.py
+```
 
+## Run ablation experiments
+```bash
+# TCN
+python S2I_Behavior_Model/Ablation/s2i_decompose_mask_attention_tcn_24_72_168_ablation.py
 
-## **3. Run ablation experiments**
+# CapsNet
+python S2I_Behavior_Model/Ablation/s2i_decompose_mask_attention_caps_24_72_168_ablation.py
 
-TCN: python S2I_Behavior_Model/Ablation/s2i_decompose_mask_attention_tcn_24_72_168_ablation.py
+# XGBoost
+python S2I_Behavior_Model/Ablation/s2i_decompose_mask_attention_xgb_24_72_168_ablation.py
+```
 
-CapsNet: python S2I_Behavior_Model/Ablation/s2i_decompose_mask_attention_caps_24_72_168_ablation.py
-
-XGBoost: python S2I_Behavior_Model/Ablation/s2i_decompose_mask_attention_xgb_24_72_168_ablation.py
-
+---
 
