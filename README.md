@@ -1,11 +1,10 @@
-# DeviWave-ITD
+
+# DeviWave-ITD: Multi-Resolution Insider Threat Detection with Behavioral Matrices & Wavelet Decomposition
 
 <p align="center">
   <a href="./README.md">English</a> |
   <a href="./README_CN.md">简体中文</a>
 </p>
-
-# DeviWave-ITD: Multi-Resolution Insider Threat Detection with Behavioral Matrices & Wavelet Decomposition
 
 ## 📘 Overview
 
