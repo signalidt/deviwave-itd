@@ -1,11 +1,11 @@
-# DeviWave-ITD
+
+# DeviWave-ITD：基于多分辨率行为矩阵与小波分解的内部威胁检测框架
+
 
 <p align="center">
   <a href="./README.md">English</a> |
   <a href="./README_CN.md">简体中文</a>
 </p>
-
-# DeviWave-ITD：基于多分辨率行为矩阵与小波分解的内部威胁检测框架
 
 ## 📘 项目简介
 
